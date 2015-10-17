@@ -1,0 +1,22 @@
+body {
+	margin: 0 auto;
+	background-color: steelblue;
+	font-family: helvetica;
+}
+
+h1 {
+	text-align: center;
+	color: white;
+	background-color: grey;
+	outline-style: solid;
+	outline-color: black;
+}
+
+#slimeCanvas {
+  display: block;
+  margin: 0 auto;
+	background-color: white;
+	padding-left: 0;
+  padding-right: 0;
+}
+
