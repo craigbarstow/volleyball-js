@@ -5,11 +5,30 @@ $( document ).ready(function() {
     canvasHeight = $("#slimeCanvas").height(),
     canvasWidth = $("#slimeCanvas").width(),
     canvasCenter = canvasWidth / 2,
+    frameRate = 30,
     // Canvas Background Object Variables
     floorHeight = canvasHeight / 30,
     netHeight = canvasHeight / 3,
     netBase = canvasHeight - floorHeight,
     netWidth = canvasWidth / 60,
+    // Object Detection Variables
+    Box = function(left, top, right, bottom) {
+      this.left = left;
+      this.top = top;
+      this.right = right;
+      this.bottom = bottom;
+      this.contains = function(circleObj) {
+        // If circleObj is in this box
+        return true;
+      };
+    },
+    leftBox = new Box(0, 0, canvasCenter-(netWidth/2), canvasHeight - floorHeight);
+    netTopBox = new Box(canvasCenter - (netWidth/2), 0,
+      canvasCenter + (netWidth/2), canvasHeight - floorHeight - netHeight);
+    rightBox = new Box(canvasCenter + (netWidth/2), 0, canvasWidth, canvasHeight - floorHeight);
+
+    // Color Variables
+    backgroundColor = "#fcfeff",
     // Object Variables
     playerRadius = 50,
     ballRadius = 40,
@@ -33,11 +52,11 @@ $( document ).ready(function() {
     },
 
     // Create Player and Ball Objects
-    playerLeft = new Sphere(canvasWidth * .25, playerMinPosition, playerRadius, 'red');
-    playerRight = new Sphere(canvasWidth * .75, playerMinPosition, playerRadius, 'blue');
-    ball = new Sphere(ballStartsLeft ? canvasWidth * .75 : canvasWidth * .25, ballStartPosition, ballRadius, 'white');
+    playerLeft = new Sphere(canvasWidth * .25, playerMinPosition, playerRadius, 'red'),
+    playerRight = new Sphere(canvasWidth * .75, playerMinPosition, playerRadius, 'blue'),
+    ball = new Sphere(ballStartsLeft ? canvasWidth * .75 : canvasWidth * .25, ballStartPosition, ballRadius, 'white'),
 
-    renderCircle = function(circleObj) {
+    renderCircle = function(circleObj, next) {
       ctx.fillStyle = circleObj.color;
       ctx.strokeStyle = 'black';
       ctx.beginPath();
@@ -46,18 +65,12 @@ $( document ).ready(function() {
       ctx.closePath();
       ctx.fill();
 
-      // return next();
-    },
-
-    clearCanvas = function(next) {
-      context.clearRect(0, 0, canvas.width, canvas.height);
       return next();
     },
 
     drawBackground = function(next) {
       // Set background color
-      // context.fillStyle = "#E6F5FF";
-      ctx.fillStyle = "#fcfeff";
+      ctx.fillStyle = backgroundColor;
       ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 
       // Set up the net
@@ -71,44 +84,46 @@ $( document ).ready(function() {
       return next();
     },
 
+    renderObjects = function(next) {
+      async.waterfall([
+        drawBackground,
 
-  // Perform initial setup
-  async.waterfall([
-    drawBackground,
-  ], function (err) {
-    console.log(err);
-    console.log('done');
+        async.apply(renderCircle, playerLeft),
+        async.apply(renderCircle, playerRight),
+        async.apply(renderCircle, ball)
+      ], function(err) {
+        next(err);
+      });
+    },
+
+    gameLoop = function() {
+      async.waterfall([
+        renderObjects
+      ], function(err) {
+        if (err) {
+          console.log(err);
+        }
+      });
+    };
+
+  // Set up key bindings for moving the left player
+  $(document).keydown(function(e) {
+      switch(e.which) {
+          case 87: // W, Up
+          break;
+
+          case 65: // A, Left
+          playerLeft.x -= 20;
+          break;
+
+          case 68: // D, Right
+          playerLeft.x += 20;
+          break;
+
+          default: return; // exit this handler for other keys
+      }
   });
 
-  renderCircle(playerLeft);
-  renderCircle(playerRight);
-  renderCircle(ball);
-
-
+  // Start the game loop
+  setInterval(gameLoop, 10000 / frameRate);
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
