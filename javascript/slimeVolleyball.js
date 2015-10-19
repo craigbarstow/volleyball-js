@@ -1,16 +1,36 @@
+'use strict'
+
 $( document ).ready(function() {
-  var
-    ctx = document.getElementById("slimeCanvas").getContext("2d");
-    // General Canvas Variables
+  // Constants
+  const
     canvasHeight = $("#slimeCanvas").height(),
     canvasWidth = $("#slimeCanvas").width(),
     canvasCenter = canvasWidth / 2,
     frameRate = 30,
-    // Canvas Background Object Variables
+    // Canvas Background Object Constants
     floorHeight = canvasHeight / 30,
     netHeight = canvasHeight / 3,
     netBase = canvasHeight - floorHeight,
     netWidth = canvasWidth / 60,
+    // Color Constants
+    backgroundColor = "#fcfeff",
+    playerLeftColor = 'red',
+    playerRightColor = 'blue',
+    ballColor = 'white',
+    // Object Constants
+    playerRadius = 50,
+    ballRadius = 40,
+    ballStartPosition = canvasHeight * .5,
+    // Collision Constants
+    playerMinPosition =  canvasHeight - playerRadius - floorHeight,
+    minPlayerLeftX = playerRadius,
+    maxplayerLeftX = (canvasWidth *.5) - playerRadius - (netWidth * .5),
+    minPlayerRightX = (canvasWidth *.5) + playerRadius + (netWidth * .5),
+    maxPlayerRightX = canvasWidth - playerRadius;
+
+  var
+    ctx = document.getElementById("slimeCanvas").getContext("2d"),
+
     // Object Detection Variables
     Box = function(left, top, right, bottom) {
       this.left = left;
@@ -22,24 +42,13 @@ $( document ).ready(function() {
         return true;
       };
     },
-    leftBox = new Box(0, 0, canvasCenter-(netWidth/2), canvasHeight - floorHeight);
-    netTopBox = new Box(canvasCenter - (netWidth/2), 0,
-      canvasCenter + (netWidth/2), canvasHeight - floorHeight - netHeight);
-    rightBox = new Box(canvasCenter + (netWidth/2), 0, canvasWidth, canvasHeight - floorHeight);
 
-    // Color Variables
-    backgroundColor = "#fcfeff",
-    // Object Variables
-    playerRadius = 50,
-    ballRadius = 40,
-    ballStartPosition = canvasHeight * .5,
+    leftBox = new Box(0, 0, canvasCenter-(netWidth/2), canvasHeight - floorHeight),
+    netTopBox = new Box(canvasCenter - (netWidth/2), 0,
+      canvasCenter + (netWidth/2), canvasHeight - floorHeight - netHeight),
+    rightBox = new Box(canvasCenter + (netWidth/2), 0, canvasWidth, canvasHeight - floorHeight),
+
     ballStartsLeft = true,
-    // Collision Variables
-    playerMinPosition =  canvasHeight - playerRadius - floorHeight;
-    minPlayerLeftX = playerRadius,
-    maxplayerLeftX = (canvasWidth *.5) - playerRadius - (netWidth * .5),
-    minPlayerRightX = (canvasWidth *.5) + playerRadius + (netWidth * .5),
-    maxPlayerRightX = canvasWidth - playerRadius,
 
     // Functions
     Sphere = function(x, y, radius, color) {
@@ -52,9 +61,9 @@ $( document ).ready(function() {
     },
 
     // Create Player and Ball Objects
-    playerLeft = new Sphere(canvasWidth * .25, playerMinPosition, playerRadius, 'red'),
-    playerRight = new Sphere(canvasWidth * .75, playerMinPosition, playerRadius, 'blue'),
-    ball = new Sphere(ballStartsLeft ? canvasWidth * .75 : canvasWidth * .25, ballStartPosition, ballRadius, 'white'),
+    playerLeft = new Sphere(canvasWidth * .25, playerMinPosition, playerRadius, playerLeftColor),
+    playerRight = new Sphere(canvasWidth * .75, playerMinPosition, playerRadius, playerRightColor),
+    ball = new Sphere(ballStartsLeft ? canvasWidth * .75 : canvasWidth * .25, ballStartPosition, ballRadius, ballColor),
 
     renderCircle = function(circleObj, next) {
       ctx.fillStyle = circleObj.color;
@@ -125,5 +134,5 @@ $( document ).ready(function() {
   });
 
   // Start the game loop
-  setInterval(gameLoop, 10000 / frameRate);
+  setInterval(gameLoop, 5000 / frameRate);
 });
