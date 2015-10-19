@@ -96,6 +96,7 @@ $( document ).ready(function() {
 
     gameLoop = function() {
       async.waterfall([
+
         // Render Canvas
         render.background,
         async.apply(render.circle, playerLeft),
@@ -111,6 +112,7 @@ $( document ).ready(function() {
   // Set up key bindings for moving the left player
   $(document).keydown(function(e) {
       switch(e.which) {
+          // Left Player Bindings
           case 87: // W, Up
           break;
 
@@ -120,6 +122,16 @@ $( document ).ready(function() {
 
           case 68: // D, Right
           playerLeft.x += 20;
+          break;
+
+          // Right Player Bindings
+          case 38: // Up Arrow
+          break;
+
+          case 37: // Left Arrow
+          break;
+
+          case 39: // Right Arrow
           break;
 
           default: return; // exit this handler for other keys
