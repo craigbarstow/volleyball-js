@@ -50,7 +50,6 @@ $( document ).ready(function() {
 
     ballStartsLeft = true,
 
-    // Functions
     Sphere = function(x, y, radius, color) {
       this.x = x;
       this.y = y;
@@ -65,49 +64,43 @@ $( document ).ready(function() {
     playerRight = new Sphere(canvasWidth * .75, playerMinPosition, playerRadius, playerRightColor),
     ball = new Sphere(ballStartsLeft ? canvasWidth * .75 : canvasWidth * .25, ballStartPosition, ballRadius, ballColor),
 
-    renderCircle = function(circleObj, next) {
-      ctx.fillStyle = circleObj.color;
-      ctx.strokeStyle = 'black';
-      ctx.beginPath();
-      ctx.arc(circleObj.x, circleObj.y, circleObj.radius, 0, 2*Math.PI);
-      ctx.stroke();
-      ctx.closePath();
-      ctx.fill();
+    render = {
+      circle: function(circleObj, next) {
+        ctx.fillStyle = circleObj.color;
+        ctx.strokeStyle = 'black';
+        ctx.beginPath();
+        ctx.arc(circleObj.x, circleObj.y, circleObj.radius, 0, 2*Math.PI);
+        ctx.stroke();
+        ctx.closePath();
+        ctx.fill();
 
-      return next();
-    },
+        return next();
+      },
 
-    drawBackground = function(next) {
-      // Set background color
-      ctx.fillStyle = backgroundColor;
-      ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+      background: function(next) {
+        // Set background color
+        ctx.fillStyle = backgroundColor;
+        ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 
-      // Set up the net
-      ctx.fillStyle = "#707070";
-      ctx.fillRect(canvasCenter-(netWidth/2), canvasHeight-netHeight, netWidth, netHeight-floorHeight);
+        // Set up the net
+        ctx.fillStyle = "#707070";
+        ctx.fillRect(canvasCenter-(netWidth/2), canvasHeight-netHeight, netWidth, netHeight-floorHeight);
 
-      // Set up the floor
-      ctx.fillStyle = "#906D4B";
-      ctx.fillRect(0, canvasHeight-floorHeight, canvasWidth, canvasHeight);
+        // Set up the floor
+        ctx.fillStyle = "#906D4B";
+        ctx.fillRect(0, canvasHeight-floorHeight, canvasWidth, canvasHeight);
 
-      return next();
-    },
-
-    renderObjects = function(next) {
-      async.waterfall([
-        drawBackground,
-
-        async.apply(renderCircle, playerLeft),
-        async.apply(renderCircle, playerRight),
-        async.apply(renderCircle, ball)
-      ], function(err) {
-        next(err);
-      });
+        return next();
+      }
     },
 
     gameLoop = function() {
       async.waterfall([
-        renderObjects
+        // Render Canvas
+        render.background,
+        async.apply(render.circle, playerLeft),
+        async.apply(render.circle, playerRight),
+        async.apply(render.circle, ball)
       ], function(err) {
         if (err) {
           console.log(err);
